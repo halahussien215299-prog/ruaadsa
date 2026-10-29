@@ -1,34 +1,47 @@
 "use client";
 
 import React, { useState } from "react";
-import { Header } from "@/components/layout/Header";
-import { HeroSection } from "@/components/home/HeroSection";
-import { WhyWebsiteSection } from "@/components/home/WhyWebsiteSection";
-import { PricingSection } from "@/components/home/PricingSection";
-import { Footer } from "@/components/layout/Footer";
+import { Header } from "@/components/landing/Header";
+import { HeroSection } from "@/components/landing/HeroSection";
+import { VisualMockupSection } from "@/components/landing/VisualMockupSection";
+import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { PricingSection } from "@/components/landing/PricingSection";
+import { LeadFormSection } from "@/components/landing/LeadFormSection";
+import { FaqSection } from "@/components/landing/FaqSection";
+import { StickyMobileBar } from "@/components/landing/StickyMobileBar";
+import { Footer } from "@/components/landing/Footer";
 
-export default function HomePage() {
-  const [selectedPackage, setSelectedPackage] = useState<string>("business");
+export default function SingleLandingPage() {
+  const [selectedPkg, setSelectedPkg] = useState<string>("business");
 
   return (
-    <main className="min-h-screen flex flex-col bg-[#FAF9FC]">
-      {/* Global Navigation Header */}
+    <main className="min-h-screen flex flex-col bg-white text-[#15101E] relative selection:bg-[#56138A] selection:text-white">
+      {/* 0. Minimalist Sticky Header with Official Logo on Clean White Background */}
       <Header />
 
-      {/* Main High-Conversion Sections */}
-      <div className="flex-1">
-        {/* Section 4: Hero Section */}
-        <HeroSection />
+      {/* 1. Hero Section: 399 SAR Offer */}
+      <HeroSection />
 
-        {/* Section 5: Why Website Section */}
-        <WhyWebsiteSection />
+      {/* 2. Professional Visual Showcase: Real Website inside Laptop & Mobile */}
+      <VisualMockupSection />
 
-        {/* Section 6: Pricing Packages */}
-        <PricingSection onSelectPackage={setSelectedPackage} />
-      </div>
+      {/* 3. Core Features & Value Pillars */}
+      <FeaturesSection />
 
-      {/* Global Footer */}
+      {/* 4. The 3 Pricing Packages */}
+      <PricingSection onSelectPackage={setSelectedPkg} />
+
+      {/* 5. Fast, Low-Friction Lead Generation Form */}
+      <LeadFormSection />
+
+      {/* 6. Frequently Asked Questions (Overcoming Buyer Friction) */}
+      <FaqSection />
+
+      {/* 7. Minimalist Light-Themed Footer */}
       <Footer />
+
+      {/* 8. Sticky Mobile Bottom Conversion Bar for TikTok & Snapchat Traffic */}
+      <StickyMobileBar />
     </main>
   );
 }
