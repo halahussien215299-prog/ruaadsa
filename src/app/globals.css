@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-purple: #56138a;
+    --brand-purple-dark: #320853;
+    --brand-purple-deep: #200435;
+    --brand-purple-light: #771bbd;
+    --brand-purple-soft: #f7f1fc;
+
+    --brand-gold: #c99726;
+    --brand-gold-dark: #966f13;
+    --brand-gold-light: #f5d47a;
+    --brand-gold-soft: #fdfaf2;
+
+    --bg-page: #faf9fc;
+    --bg-card: #ffffff;
+    --text-primary: #15101e;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    --border-light: #ece8f2;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    direction: rtl;
+    text-align: right;
+  }
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-arabic), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Utilities for High-End Visual Aesthetics */
+.gradient-purple-gold {
+  background: linear-gradient(135deg, #56138a 0%, #320853 60%, #c99726 100%);
+}
+
+.gradient-gold-text {
+  background: linear-gradient(135deg, #dfa932 0%, #c99726 50%, #966f13 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-purple-text {
+  background: linear-gradient(135deg, #771bbd 0%, #56138a 60%, #320853 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-glow-purple {
+  background: radial-gradient(circle at 50% 50%, rgba(86, 19, 138, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+.hero-glow-gold {
+  background: radial-gradient(circle at 50% 50%, rgba(201, 151, 38, 0.09) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+.shadow-premium {
+  box-shadow: 0 10px 30px -10px rgba(50, 8, 83, 0.08), 0 4px 6px -2px rgba(50, 8, 83, 0.03);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 20px 40px -15px rgba(86, 19, 138, 0.12), 0 0 0 1px rgba(201, 151, 38, 0.15);
+}
+
+.shadow-gold-button {
+  box-shadow: 0 8px 24px -6px rgba(201, 151, 38, 0.35);
+}
+
+.shadow-purple-button {
+  box-shadow: 0 8px 24px -6px rgba(86, 19, 138, 0.35);
+}
+
+/* Glass effect */
+.glass-header {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
