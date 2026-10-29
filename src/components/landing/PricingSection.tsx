@@ -197,3 +197,4 @@ export function PricingSection({ onSelectPackage }: PricingSectionProps) {
     </section>
   );
 }
+

@@ -10,8 +10,9 @@ import {
   Phone,
   CheckCircle2,
   AlertCircle,
-  Clock,
   ShieldCheck,
+  ArrowLeft,
+  Loader2,
 } from "lucide-react";
 
 export function LeadFormSection() {
@@ -27,7 +28,7 @@ export function LeadFormSection() {
   const [orderRef, setOrderRef] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Listen to package selection events from the pricing section
+  // Listen to package selection from the pricing cards
   useEffect(() => {
     const handlePackageEvent = (e: Event) => {
       const customEvent = e as CustomEvent<{ packageId: string }>;
@@ -48,7 +49,6 @@ export function LeadFormSection() {
     e.preventDefault();
     setErrorMsg("");
 
-    // Simple validation
     if (!name.trim()) {
       setErrorMsg("يرجى إدخال اسمك الكريم.");
       return;
@@ -56,32 +56,51 @@ export function LeadFormSection() {
 
     const cleanPhone = phone.replace(/[^0-9]/g, "");
     if (cleanPhone.length < 9) {
-      setErrorMsg("يرجى إدخال رقم جوال صحيح للتواصل (مثال: 0500000000).");
+      setErrorMsg("يرجى إدخال رقم جوال صحيح (مثال: 0500000000).");
       return;
     }
 
     setLoading(true);
 
     try {
-      // Generate a clean reference number
-      const refNumber = `RD-${Math.floor(100000 + Math.random() * 900000)}`;
-      setOrderRef(refNumber);
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          phone: cleanPhone,
+          business: business.trim(),
+          packageId: selectedPackage,
+          packageName: getPackageName(selectedPackage),
+          timeline,
+          contactMethod,
+        }),
+      });
 
-      // Trigger Confetti Celebration
-      try {
-        confetti({
-          particleCount: 80,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ["#56138A", "#C99726", "#F5D47A", "#320853"],
-        });
-      } catch (err) {
-        // Safe fallback if confetti isn't supported
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setOrderRef(result.reference || `RD-${Math.floor(100000 + Math.random() * 900000)}`);
+        setSubmitted(true);
+
+        try {
+          confetti({
+            particleCount: 100,
+            spread: 80,
+            origin: { y: 0.6 },
+            colors: ["#56138A", "#C99726", "#F5D47A", "#320853"],
+          });
+        } catch {
+          // ignore if canvas unavailable
+        }
+      } else {
+        setErrorMsg(result.message || "حدث خطأ أثناء معالجة الطلب، يرجى المحاولة مرة أخرى.");
       }
-
+    } catch {
+      // In case of any network issue, generate reference and allow WhatsApp confirmation
+      const fallbackRef = `RD-${Math.floor(100000 + Math.random() * 900000)}`;
+      setOrderRef(fallbackRef);
       setSubmitted(true);
-    } catch (err) {
-      setErrorMsg("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة أو التواصل مباشرة عبر واتساب.");
     } finally {
       setLoading(false);
     }
@@ -100,38 +119,38 @@ export function LeadFormSection() {
   };
 
   return (
-    <section id="lead-form" className="py-14 sm:py-20 bg-white relative overflow-hidden">
+    <section id="lead-form" className="py-16 sm:py-24 bg-white relative overflow-hidden">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-        {/* Section Header */}
+        {/* Header */}
         <div className="text-center max-w-xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F5EEFA] border border-[#E4D1F5] text-[#56138A] text-xs font-bold mb-3">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#F5EEFA] border border-[#E4D1F5] text-[#56138A] text-xs font-bold mb-3 shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-[#C99726]" />
-            <span>طلب موقعك يبدأ بخطوة بسيطة</span>
+            <span>تنفيذ سريع واستلام خلال أيام عمل</span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#15101E] tracking-tight">
-            احجز موقعك الآن واستلم خلال أيام
+            احجز موقعك الآن وابدأ بنجاح
           </h2>
           <p className="mt-2 text-sm text-[#4B5563]">
-            املأ بياناتك أدناه وسيتواصل معك مستشارنا التقني فوراً لتحديد تفاصيل نشاطك.
+            أرسل بياناتك وسيتواصل معك مستشارنا لتأكيد التفاصيل والبدء مباشرة.
           </p>
         </div>
 
-        {/* Lead Generation Card */}
+        {/* Lead Form Card */}
         <div className="bg-[#FAF9FC] border border-[#ECE8F2] rounded-3xl p-6 sm:p-10 shadow-sm relative">
           {submitted ? (
-            /* Success State */
-            <div className="text-center py-8">
+            /* Success Confirmation State */
+            <div className="text-center py-6">
               <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
-              <span className="text-xs font-bold text-[#C99726] px-3 py-1 rounded-full bg-[#FCF8EE] border border-[#E9D6A0]">
+              <span className="text-xs font-bold text-[#C99726] px-3.5 py-1 rounded-full bg-[#FCF8EE] border border-[#E9D6A0]">
                 الرقم المرجعي لطلبك: {orderRef}
               </span>
-              <h3 className="text-2xl font-black text-[#15101E] mt-3">
+              <h3 className="text-2xl sm:text-3xl font-black text-[#15101E] mt-3">
                 تم استلام طلبك بنجاح!
               </h3>
               <p className="text-sm text-[#4B5563] mt-2 max-w-md mx-auto leading-relaxed">
-                شكراً لثقتك بمؤسسة رواد الرقمية. سيقوم فريقنا بالتواصل معك عبر {contactMethod} خلال وقت قصير لتأكيد التفاصيل والبدء بالتنفيذ.
+                شكراً لثقتك بمؤسسة رواد الرقمية. سيتواصل معك فريقنا عبر {contactMethod} خلال ساعات العمل لمراجعة التفاصيل وتجهيز موقعك.
               </p>
 
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -139,15 +158,15 @@ export function LeadFormSection() {
                   href={getDirectWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-md"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-md transition-all active:scale-95"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>تأكيد الطلب فوراً عبر واتساب</span>
+                  <span>تأكيد ومتابعة الطلب عبر واتساب</span>
                 </a>
 
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="w-full sm:w-auto px-5 py-3.5 rounded-xl font-bold text-xs text-[#56138A] bg-white border border-[#ECE8F2] hover:bg-slate-50"
+                  className="w-full sm:w-auto px-5 py-3.5 rounded-xl font-bold text-xs text-[#56138A] bg-white border border-[#ECE8F2] hover:bg-slate-50 transition-colors"
                 >
                   إرسال طلب آخر
                 </button>
@@ -174,7 +193,7 @@ export function LeadFormSection() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="مثال: محمد السبيعي"
+                    placeholder="مثال: تركي القحطاني"
                     className="w-full px-4 py-3 rounded-xl bg-white border border-[#D5CBE3] focus:border-[#56138A] focus:outline-none focus:ring-2 focus:ring-[#56138A]/10 text-sm text-[#15101E]"
                   />
                 </div>
@@ -200,7 +219,7 @@ export function LeadFormSection() {
                 </div>
               </div>
 
-              {/* Row 2: Business Type & Package */}
+              {/* Row 2: Business & Package */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-[#15101E] mb-1.5">
@@ -210,19 +229,19 @@ export function LeadFormSection() {
                     type="text"
                     value={business}
                     onChange={(e) => setBusiness(e.target.value)}
-                    placeholder="مثال: مقاولات، كافيه، خدمات، متجر..."
+                    placeholder="مثال: مقاولات، متجر، خدمات، كافيه..."
                     className="w-full px-4 py-3 rounded-xl bg-white border border-[#D5CBE3] focus:border-[#56138A] focus:outline-none focus:ring-2 focus:ring-[#56138A]/10 text-sm text-[#15101E]"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-[#15101E] mb-1.5">
-                    الباقة المطلوبة
+                    الباقة المختارة
                   </label>
                   <select
                     value={selectedPackage}
                     onChange={(e) => setSelectedPackage(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#D5CBE3] focus:border-[#56138A] focus:outline-none focus:ring-2 focus:ring-[#56138A]/10 text-sm text-[#15101E]"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#D5CBE3] focus:border-[#56138A] focus:outline-none focus:ring-2 focus:ring-[#56138A]/10 text-sm text-[#15101E] font-medium"
                   >
                     {siteConfig.packages.map((pkg) => (
                       <option key={pkg.id} value={pkg.id}>
@@ -237,7 +256,7 @@ export function LeadFormSection() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-[#15101E] mb-1.5">
-                    متى ترغب في استلام موقعك؟
+                    موعد التنفيذ المفضل
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {["فوراً", "خلال أسبوع", "مجرد استفسار"].map((t) => (
@@ -245,9 +264,9 @@ export function LeadFormSection() {
                         type="button"
                         key={t}
                         onClick={() => setTimeline(t)}
-                        className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border ${
+                        className={`py-2 px-1 rounded-xl text-xs font-bold transition-all border ${
                           timeline === t
-                            ? "bg-[#56138A] text-white border-[#56138A]"
+                            ? "bg-[#56138A] text-white border-[#56138A] shadow-xs"
                             : "bg-white text-[#4B5563] border-[#ECE8F2] hover:border-gray-300"
                         }`}
                       >
@@ -272,7 +291,7 @@ export function LeadFormSection() {
                         onClick={() => setContactMethod(item.id)}
                         className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all border ${
                           contactMethod === item.id
-                            ? "bg-[#56138A] text-white border-[#56138A]"
+                            ? "bg-[#56138A] text-white border-[#56138A] shadow-xs"
                             : "bg-white text-[#4B5563] border-[#ECE8F2] hover:border-gray-300"
                         }`}
                       >
@@ -284,27 +303,36 @@ export function LeadFormSection() {
                 </div>
               </div>
 
-              {/* Consent check */}
+              {/* Privacy and consent */}
               <p className="text-[11px] text-[#6B7280] leading-relaxed">
-                بإرسال هذا النموذج، فإنك توافق على قيام فريق مؤسسة رواد الرقمية بالتواصل معك لتقديم الاستشارة وتفاصيل العرض.
+                بإرسال هذا النموذج، فإنك توافق على قيام فريق مؤسسة رواد الرقمية بالتواصل معك لمراجعة متطلباتك وتقديم الاستشارة اللازمة.
               </p>
 
-              {/* Submit Buttons */}
+              {/* Submission CTAs */}
               <div className="pt-2 flex flex-col sm:flex-row items-stretch gap-3">
                 <button
                   type="submit"
                   disabled={loading}
                   className="flex-1 py-4 px-6 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#56138A] via-[#6B17A6] to-[#320853] hover:from-[#430B6E] hover:to-[#220438] shadow-[0_8px_20px_rgba(86,19,138,0.3)] transition-all flex items-center justify-center gap-2 disabled:opacity-70 transform active:scale-[0.98]"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>{loading ? "جارٍ الإرسال..." : "إرسال طلب الموقع"}</span>
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>جارٍ تأكيد الطلب...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>إرسال طلب الموقع</span>
+                    </>
+                  )}
                 </button>
 
                 <a
                   href={getDirectWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-4 px-5 rounded-xl font-bold text-xs sm:text-sm text-[#14532D] bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] flex items-center justify-center gap-2 transition-colors"
+                  className="py-4 px-5 rounded-xl font-bold text-xs sm:text-sm text-[#14532D] bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] flex items-center justify-center gap-2 transition-colors active:scale-95"
                 >
                   <MessageCircle className="w-4 h-4 text-emerald-600" />
                   <span>أو اطلب مباشرة عبر واتساب</span>
