@@ -66,7 +66,7 @@ export const siteConfig: SiteConfig = {
   description:
     "مؤسسة رواد الرقمية للدعاية والإعلان — شريكك الموثوق لتصميم وتطوير مواقع إلكترونية عصرية وصفحات هبوط عالية التحويل تعزز مبيعاتك وتظهر نشاطك بصورة تليق بعلامتك.",
   logo: "/images/logo.png",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://rowaddigital.sa",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://ruaadsa.vercel.app",
   country: "المملكة العربية السعودية",
   city: "المدينة المنورة",
 
