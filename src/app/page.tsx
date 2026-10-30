@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { VisualMockupSection } from "@/components/landing/VisualMockupSection";
+import { PortfolioSection } from "@/components/landing/PortfolioSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { LeadFormSection } from "@/components/landing/LeadFormSection";
@@ -25,16 +26,19 @@ export default function SingleLandingPage() {
       {/* 2. Professional Visual Showcase: Real Website inside Laptop & Mobile */}
       <VisualMockupSection />
 
-      {/* 3. Core Features & Value Pillars */}
+      {/* 3. Real Live Portfolio: Corporate Websites & E-Commerce Stores */}
+      <PortfolioSection />
+
+      {/* 4. Core Features & Value Pillars */}
       <FeaturesSection />
 
-      {/* 4. The 3 Pricing Packages */}
+      {/* 5. The 3 Pricing Packages */}
       <PricingSection onSelectPackage={setSelectedPkg} />
 
-      {/* 5. Fast, Low-Friction Lead Generation Form */}
+      {/* 6. Fast, Low-Friction Lead Generation Form */}
       <LeadFormSection />
 
-      {/* 6. Frequently Asked Questions (Overcoming Buyer Friction) */}
+      {/* 7. Frequently Asked Questions (Overcoming Buyer Friction) */}
       <FaqSection />
 
       {/* 7. Minimalist Light-Themed Footer */}

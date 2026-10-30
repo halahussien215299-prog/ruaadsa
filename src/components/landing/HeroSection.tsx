@@ -13,6 +13,7 @@ import {
   Smartphone,
   CheckCircle2,
   ShieldCheck,
+  FolderKanban,
 } from "lucide-react";
 
 export function HeroSection() {
@@ -99,13 +100,13 @@ export function HeroSection() {
             <span>تواصل فوري عبر واتساب</span>
           </a>
 
-          {/* Direct Call Button */}
+          {/* Portfolio Showcase Button */}
           <a
-            href={`tel:${siteConfig.contact.phone}`}
-            className="hidden sm:inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl font-bold text-base text-[#320853] bg-[#FAF9FC] border border-[#ECE8F2] hover:bg-slate-100 transition-colors"
+            href="#portfolio"
+            className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-base text-[#320853] bg-white border border-[#D5CBE3] hover:border-[#56138A] hover:bg-[#FAF7FD] shadow-xs transition-all"
           >
-            <Phone className="w-4 h-4 text-[#56138A]" />
-            <span>اتصال هاتفي</span>
+            <FolderKanban className="w-5 h-5 text-[#C99726]" />
+            <span>نماذج من أعمالنا (24+ موقع)</span>
           </a>
         </div>
 

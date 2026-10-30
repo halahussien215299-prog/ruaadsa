@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { siteConfig } from "@/config/site";
-import { Phone, MessageCircle, ArrowLeft } from "lucide-react";
+import { MessageCircle, ArrowLeft, FolderKanban } from "lucide-react";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -57,12 +57,12 @@ export function Header() {
           {/* Direct Contact CTAs */}
           <div className="flex items-center gap-2 sm:gap-3">
             <a
-              href={`tel:${siteConfig.contact.phone}`}
-              className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-[#320853] bg-[#F5EEFA] hover:bg-[#EBDCF7] transition-colors"
-              title="اتصال مباشر"
+              href="#portfolio"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#320853] bg-[#FAF2DC] hover:bg-[#F3E5C0] border border-[#E9D6A0] transition-colors"
+              title="استعراض نماذج من أعمالنا"
             >
-              <Phone className="w-3.5 h-3.5 text-[#56138A]" />
-              <span>اتصل بنا</span>
+              <FolderKanban className="w-3.5 h-3.5 text-[#966F13]" />
+              <span>نماذج من أعمالنا</span>
             </a>
 
             <a

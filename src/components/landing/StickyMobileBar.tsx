@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { siteConfig } from "@/config/site";
-import { MessageCircle, Phone, ArrowLeft, Sparkles } from "lucide-react";
+import { MessageCircle, ArrowLeft, Sparkles, FolderKanban } from "lucide-react";
 
 export function StickyMobileBar() {
   const [visible, setVisible] = useState(false);
@@ -25,13 +25,13 @@ export function StickyMobileBar() {
   return (
     <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#ECE8F2] p-2.5 shadow-[0_-8px_25px_rgba(0,0,0,0.08)] animate-in slide-in-from-bottom duration-200">
       <div className="grid grid-cols-12 gap-2 items-center">
-        {/* Call Button */}
+        {/* Portfolio Button */}
         <a
-          href={`tel:${siteConfig.contact.phone}`}
-          className="col-span-3 flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-slate-100 text-[#320853] text-[10px] font-bold active:scale-95 transition-transform"
+          href="#portfolio"
+          className="col-span-3 flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-[#FAF2DC] text-[#966F13] border border-[#E9D6A0] text-[10px] font-bold active:scale-95 transition-transform"
         >
-          <Phone className="w-4 h-4 text-[#56138A] mb-0.5" />
-          <span>اتصال</span>
+          <FolderKanban className="w-4 h-4 text-[#966F13] mb-0.5" />
+          <span>أعمالنا</span>
         </a>
 
         {/* WhatsApp Button */}
