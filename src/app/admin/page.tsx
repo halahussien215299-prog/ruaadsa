@@ -291,6 +291,13 @@ export default function AdminDashboardPage() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
+              href="/video-studio"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 transition-colors"
+            >
+              <span>أستوديو الفيديو 🎬</span>
+            </Link>
+
+            <Link
               href="/"
               target="_blank"
               className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-[#56138A] bg-[#F5EEFA] hover:bg-[#EBDCF7] transition-colors"
