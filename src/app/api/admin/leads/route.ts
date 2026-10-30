@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Lead } from "@/models/Lead";
+import { verifySignedSessionToken, sanitizeSearchString } from "@/lib/security";
 
-function checkAuth(req: NextRequest) {
+function checkAuth(req: NextRequest): boolean {
   const sessionCookie = req.cookies.get("rowad_admin_session");
-  return sessionCookie?.value === "authenticated_admin";
+  return verifySignedSessionToken(sessionCookie?.value);
 }
 
-// GET all leads with optional status filter & search
+// GET all leads with sanitized query & auth check
 export async function GET(req: NextRequest) {
   if (!checkAuth(req)) {
     return NextResponse.json(
@@ -27,24 +28,26 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
-    const search = searchParams.get("search");
+    const rawSearch = searchParams.get("search");
 
     const query: any = {};
 
-    if (status && status !== "all") {
+    const validStatuses = ["new", "contacted", "interested", "not_interested", "won", "closed"];
+    if (status && validStatuses.includes(status)) {
       query.status = status;
     }
 
-    if (search) {
+    if (rawSearch && rawSearch.trim()) {
+      const sanitized = sanitizeSearchString(rawSearch.trim());
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { phone: { $regex: search, $options: "i" } },
-        { reference: { $regex: search, $options: "i" } },
-        { business: { $regex: search, $options: "i" } },
+        { name: { $regex: sanitized, $options: "i" } },
+        { phone: { $regex: sanitized, $options: "i" } },
+        { reference: { $regex: sanitized, $options: "i" } },
+        { business: { $regex: sanitized, $options: "i" } },
       ];
     }
 
-    const leads = await Lead.find(query).sort({ createdAt: -1 }).lean();
+    const leads = await Lead.find(query).sort({ createdAt: -1 }).limit(200).lean();
 
     // Compute metrics
     const totalLeads = await Lead.countDocuments();
@@ -92,18 +95,28 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const { id, status, notes, priority, saleAmount } = body;
 
-    if (!id) {
+    if (!id || typeof id !== "string") {
       return NextResponse.json(
-        { success: false, message: "معرف الطلب مطلوب" },
+        { success: false, message: "معرف الطلب غير صالح" },
         { status: 400 }
       );
     }
 
+    const validStatuses = ["new", "contacted", "interested", "not_interested", "won", "closed"];
     const updateFields: any = {};
-    if (status) updateFields.status = status;
-    if (notes !== undefined) updateFields.notes = notes;
-    if (priority) updateFields.priority = priority;
-    if (saleAmount !== undefined) updateFields.saleAmount = saleAmount;
+
+    if (status && validStatuses.includes(status)) {
+      updateFields.status = status;
+    }
+    if (typeof notes === "string") {
+      updateFields.notes = notes.slice(0, 1000);
+    }
+    if (priority && ["high", "medium", "low"].includes(priority)) {
+      updateFields.priority = priority;
+    }
+    if (typeof saleAmount === "number" && saleAmount >= 0) {
+      updateFields.saleAmount = saleAmount;
+    }
 
     const updated = await Lead.findByIdAndUpdate(id, updateFields, { new: true });
 
@@ -142,9 +155,9 @@ export async function DELETE(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
-    if (!id) {
+    if (!id || typeof id !== "string") {
       return NextResponse.json(
-        { success: false, message: "معرف الطلب مطلوب" },
+        { success: false, message: "معرف الطلب غير صالح" },
         { status: 400 }
       );
     }
