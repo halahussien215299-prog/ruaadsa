@@ -2,6 +2,7 @@
 
 import React from "react";
 import { siteConfig, PricingPackage } from "@/config/site";
+import { trackContact } from "@/lib/metaPixel";
 import {
   Check,
   Sparkles,
@@ -171,6 +172,7 @@ export function PricingSection({ onSelectPackage }: PricingSectionProps) {
                       href={getWhatsAppLink(pkg.name)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => trackContact("WhatsApp", `Pricing Package: ${pkg.name}`)}
                       className="w-full py-2.5 px-3 rounded-xl font-medium text-xs text-[#14532D] bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC]/70 flex items-center justify-center gap-1.5 transition-colors"
                     >
                       <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />

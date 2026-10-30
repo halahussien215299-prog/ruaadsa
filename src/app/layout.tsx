@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Tajawal } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 
 const tajawal = Tajawal({
   subsets: ["arabic"],
@@ -77,6 +78,7 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={`${tajawal.variable} scroll-smooth`}>
       <body className="min-h-screen flex flex-col font-sans bg-[#FAF9FC] text-[#15101E] antialiased selection:bg-[#56138a] selection:text-white">
+        <MetaPixel />
         {children}
       </body>
     </html>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { siteConfig } from "@/config/site";
+import { trackContact } from "@/lib/metaPixel";
 import { MessageCircle, ArrowLeft, FolderKanban } from "lucide-react";
 
 export function Header() {
@@ -69,6 +70,7 @@ export function Header() {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackContact("WhatsApp", "Header CTA")}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#14532D] bg-[#DCFCE7] hover:bg-[#BBF7D0] transition-colors border border-[#86EFAC]/60"
               title="واتساب مباشر"
             >

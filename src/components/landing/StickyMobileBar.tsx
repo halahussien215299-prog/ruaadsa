@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { siteConfig } from "@/config/site";
+import { trackContact } from "@/lib/metaPixel";
 import { MessageCircle, ArrowLeft, Sparkles, FolderKanban } from "lucide-react";
 
 export function StickyMobileBar() {
@@ -39,6 +40,7 @@ export function StickyMobileBar() {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackContact("WhatsApp", "Sticky Mobile Bar")}
           className="col-span-4 flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-[#DCFCE7] text-[#14532D] border border-emerald-300 text-[10px] font-black active:scale-95 transition-transform"
         >
           <MessageCircle className="w-4 h-4 text-emerald-600 mb-0.5" />

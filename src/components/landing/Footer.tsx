@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import { siteConfig } from "@/config/site";
+import { trackContact } from "@/lib/metaPixel";
 import { Phone, MessageCircle, Mail, MapPin, ShieldCheck } from "lucide-react";
 
 export function Footer() {
@@ -34,6 +37,7 @@ export function Footer() {
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold">
             <a
               href={`tel:${siteConfig.contact.phone}`}
+              onClick={() => trackContact("Phone", "Footer Direct Call")}
               className="flex items-center gap-1.5 text-[#320853] hover:text-[#56138A] transition-colors"
             >
               <Phone className="w-3.5 h-3.5 text-[#56138A]" />
@@ -44,6 +48,7 @@ export function Footer() {
               href={`https://wa.me/${siteConfig.contact.whatsapp.replace(/[^0-9]/g, "")}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackContact("WhatsApp", "Footer WhatsApp")}
               className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 transition-colors"
             >
               <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />

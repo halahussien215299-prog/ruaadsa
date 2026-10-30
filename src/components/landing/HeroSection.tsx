@@ -2,6 +2,7 @@
 
 import React from "react";
 import { siteConfig } from "@/config/site";
+import { trackContact } from "@/lib/metaPixel";
 import {
   Sparkles,
   ArrowLeft,
@@ -94,6 +95,7 @@ export function HeroSection() {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackContact("WhatsApp", "Hero Instant Contact")}
             className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-base text-[#14532D] bg-[#DCFCE7] hover:bg-[#BBF7D0] border border-[#86EFAC] shadow-xs transition-all transform active:scale-[0.98]"
           >
             <MessageCircle className="w-5 h-5 text-emerald-600" />

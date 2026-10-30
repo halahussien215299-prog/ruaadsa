@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
 import { siteConfig } from "@/config/site";
+import { trackLead, trackContact } from "@/lib/metaPixel";
 import {
   Send,
   Sparkles,
@@ -80,8 +81,12 @@ export function LeadFormSection() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        setOrderRef(result.reference || `RD-${Math.floor(100000 + Math.random() * 900000)}`);
+        const refId = result.reference || `RD-${Math.floor(100000 + Math.random() * 900000)}`;
+        setOrderRef(refId);
         setSubmitted(true);
+
+        const currentPkg = siteConfig.packages.find((p) => p.id === selectedPackage);
+        trackLead(getPackageName(selectedPackage), currentPkg?.price, refId);
 
         try {
           confetti({
@@ -101,6 +106,8 @@ export function LeadFormSection() {
       const fallbackRef = `RD-${Math.floor(100000 + Math.random() * 900000)}`;
       setOrderRef(fallbackRef);
       setSubmitted(true);
+      const currentPkg = siteConfig.packages.find((p) => p.id === selectedPackage);
+      trackLead(getPackageName(selectedPackage), currentPkg?.price, fallbackRef);
     } finally {
       setLoading(false);
     }
@@ -158,6 +165,7 @@ export function LeadFormSection() {
                   href={getDirectWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackContact("WhatsApp", "Lead Confirmation WhatsApp")}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-md transition-all active:scale-95"
                 >
                   <MessageCircle className="w-4 h-4" />
