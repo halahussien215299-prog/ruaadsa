@@ -81,7 +81,7 @@ export function PortfolioSection() {
             نماذج حية من أعمالنا المنفذة
           </h2>
           <p className="mt-3 text-sm sm:text-base text-[#4B5563]">
-            مواقع وشركات ومتاجر حقيقية تعمل الآن على الإنترنت، صممناها وطورناها وفق أعلى معايير الجودة والسرعة.
+            شاهد صور ومواقع حقيقية صممناها وبرمجناها لعملائنا، متوافقة 100% مع الهواتف ومحركات البحث.
           </p>
         </div>
 
@@ -117,7 +117,7 @@ export function PortfolioSection() {
           })}
         </div>
 
-        {/* Portfolio Cards Grid */}
+        {/* Portfolio Cards Grid with Real Screenshots */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 sm:gap-6 gap-4">
           {displayedItems.map((item) => {
             const domain = getDomain(item.url);
@@ -125,7 +125,7 @@ export function PortfolioSection() {
             return (
               <div
                 key={item.id}
-                className="group rounded-2xl bg-[#FAF9FC] border border-[#ECE8F2] hover:border-[#56138A]/40 transition-all duration-300 hover:shadow-[0_12px_30px_rgba(86,19,138,0.08)] hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
+                className="group rounded-2xl bg-[#FAF9FC] border border-[#ECE8F2] hover:border-[#56138A]/40 transition-all duration-300 hover:shadow-[0_16px_36px_rgba(86,19,138,0.1)] hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
               >
                 <div>
                   {/* Browser Mockup Top Bar */}
@@ -142,10 +142,39 @@ export function PortfolioSection() {
                     <span className="w-4" />
                   </div>
 
+                  {/* Real Website Homepage Screenshot Preview */}
+                  <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 border-b border-[#ECE8F2]">
+                    <img
+                      src={`/portfolio/${item.id}.jpg`}
+                      alt={`معاينة موقع ${item.name}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        // Fallback to thum.io live thumbnail if file not yet downloaded
+                        const target = e.currentTarget as HTMLImageElement;
+                        if (!target.src.includes("thum.io")) {
+                          target.src = `https://image.thum.io/get/width/700/crop/850/${item.url}`;
+                        }
+                      }}
+                    />
+                    {/* Hover Overlay */}
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3"
+                    >
+                      <span className="px-3.5 py-1.5 rounded-full bg-white text-[#56138A] text-xs font-bold shadow-lg flex items-center gap-1.5">
+                        <span>معاينة الموقع الحقيقي</span>
+                        <ArrowUpRight className="w-3.5 h-3.5 text-[#C99726]" />
+                      </span>
+                    </a>
+                  </div>
+
                   {/* Card Content */}
-                  <div className="p-5 sm:p-6">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="text-base sm:text-lg font-black text-[#15101E] group-hover:text-[#56138A] transition-colors">
+                  <div className="p-4 sm:p-5">
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <h3 className="text-base font-black text-[#15101E] group-hover:text-[#56138A] transition-colors">
                         {item.name}
                       </h3>
                       {item.badge && (
@@ -155,25 +184,25 @@ export function PortfolioSection() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-[11px] font-bold text-[#56138A] px-2 py-0.5 rounded bg-[#F5EEFA]">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[10px] font-bold text-[#56138A] px-2 py-0.5 rounded bg-[#F5EEFA]">
                         {item.categoryLabel}
                       </span>
                       {item.location && (
-                        <span className="text-[11px] text-gray-500">
+                        <span className="text-[10px] text-gray-500">
                           📍 {item.location}
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs text-[#4B5563] leading-relaxed">
+                    <p className="text-xs text-[#4B5563] leading-relaxed line-clamp-2">
                       {item.description}
                     </p>
                   </div>
                 </div>
 
                 {/* Card Footer Actions */}
-                <div className="p-5 sm:p-6 pt-0 border-t border-[#ECE8F2]/60 mt-4 flex items-center justify-between gap-3">
+                <div className="p-4 sm:p-5 pt-0 border-t border-[#ECE8F2]/60 mt-2 flex items-center justify-between gap-3">
                   <a
                     href={item.url}
                     target="_blank"
