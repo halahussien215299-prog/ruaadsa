@@ -111,3 +111,4 @@ export function checkRateLimit(
 export function sanitizeSearchString(input: string): string {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").slice(0, 100);
 }
+
