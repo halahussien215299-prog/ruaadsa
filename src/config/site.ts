@@ -71,10 +71,10 @@ export const siteConfig: SiteConfig = {
   city: "الرياض",
 
   contact: {
-    phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+966500000000",
-    phoneFormatted: "050 000 0000",
-    whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+966500000000",
-    whatsappFormatted: "+966 50 000 0000",
+    phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+966541430116",
+    phoneFormatted: "054 143 0116",
+    whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+966543907572",
+    whatsappFormatted: "+966 54 390 7572",
     email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "info@rowaddigital.sa",
     workingHours: "السبت - الخميس: 9:00 ص - 9:00 م",
   },
