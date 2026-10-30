@@ -68,7 +68,7 @@ export const siteConfig: SiteConfig = {
   logo: "/images/logo.png",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://rowaddigital.sa",
   country: "المملكة العربية السعودية",
-  city: "الرياض",
+  city: "المدينة المنورة",
 
   contact: {
     phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+966541430116",
