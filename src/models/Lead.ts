@@ -14,6 +14,7 @@ export interface ILead extends Document {
   notes?: string;
   saleAmount?: number;
   source?: string;
+  idempotencyKey?: string;
   utmSource?: string;
   utmMedium?: string;
   utmCampaign?: string;
@@ -82,6 +83,11 @@ const LeadSchema: Schema = new Schema(
     source: {
       type: String,
       default: "Direct",
+    },
+    idempotencyKey: {
+      type: String,
+      index: true,
+      sparse: true,
     },
     utmSource: String,
     utmMedium: String,

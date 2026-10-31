@@ -19,6 +19,7 @@ const leadSchema = z.object({
   contactMethod: z.string().max(50).default("واتساب"),
   notes: z.string().max(500).optional(),
   source: z.string().max(50).optional(),
+  idempotencyKey: z.string().max(100).optional(),
   utmSource: z.string().max(50).optional(),
   utmMedium: z.string().max(50).optional(),
   utmCampaign: z.string().max(50).optional(),
@@ -47,6 +48,39 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validatedData = leadSchema.parse(body);
 
+    // 2. Server-side Idempotency & Duplicate Prevention
+    // Check if an existing order was already saved with this idempotencyKey
+    // OR if the same phone submitted the same package within the last 3 minutes (grace period retry)
+    try {
+      const db = await connectToDatabase();
+      if (db) {
+        let existingLead = null;
+        if (validatedData.idempotencyKey) {
+          existingLead = await Lead.findOne({ idempotencyKey: validatedData.idempotencyKey }).lean();
+        }
+        if (!existingLead) {
+          const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000);
+          existingLead = await Lead.findOne({
+            phone: validatedData.phone,
+            packageId: validatedData.packageId,
+            createdAt: { $gte: threeMinutesAgo },
+          }).lean();
+        }
+
+        if (existingLead) {
+          return NextResponse.json({
+            success: true,
+            reference: existingLead.reference,
+            savedToDatabase: true,
+            isDuplicateRetry: true,
+            message: "تم استلام طلبك بنجاح وسيتواصل معك فريق رواد الرقمية قريباً.",
+          });
+        }
+      }
+    } catch (checkErr) {
+      console.warn("Idempotency check warning:", checkErr);
+    }
+
     // Generate unique reference
     const leadRef = `RD-${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -55,7 +89,7 @@ export async function POST(req: NextRequest) {
     try {
       const db = await connectToDatabase();
       if (db) {
-        await Lead.create({
+        const createdLead = await Lead.create({
           reference: leadRef,
           name: validatedData.name,
           phone: validatedData.phone,
@@ -68,31 +102,47 @@ export async function POST(req: NextRequest) {
           priority: validatedData.timeline === "فوراً" ? "high" : "medium",
           notes: validatedData.notes || "",
           source: validatedData.source || "Website Form",
+          idempotencyKey: validatedData.idempotencyKey,
           utmSource: validatedData.utmSource,
           utmMedium: validatedData.utmMedium,
           utmCampaign: validatedData.utmCampaign,
         });
-        savedToMongo = true;
+
+        if (createdLead && createdLead._id) {
+          savedToMongo = true;
+        }
       }
     } catch (dbError) {
       console.error("MongoDB Atlas Save Warning:", dbError);
     }
 
+    if (!savedToMongo) {
+      return NextResponse.json(
+        {
+          success: false,
+          savedToDatabase: false,
+          message: "تعذر حفظ بيانات طلبك في النظام حالياً. يرجى المحاولة مرة أخرى أو التواصل معنا مباشرة عبر واتساب.",
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       reference: leadRef,
-      savedToDatabase: savedToMongo,
+      savedToDatabase: true,
       message: "تم استلام طلبك بنجاح وسيتواصل معك فريق رواد الرقمية قريباً.",
     });
   } catch (error: any) {
-    if (error instanceof z.ZodError) {
+    if (error instanceof z.ZodError || error?.name === "ZodError") {
       return NextResponse.json(
-        { success: false, errors: error.issues, message: "يرجى التأكد من صحة البيانات المدخلة" },
+        { success: false, savedToDatabase: false, errors: error.issues, message: "يرجى التأكد من صحة البيانات المدخلة" },
         { status: 400 }
       );
     }
+    console.error("Lead submission API error:", error);
     return NextResponse.json(
-      { success: false, message: "حدث خطأ أثناء معالجة الطلب." },
+      { success: false, savedToDatabase: false, message: "حدث خطأ أثناء معالجة الطلب." },
       { status: 500 }
     );
   }

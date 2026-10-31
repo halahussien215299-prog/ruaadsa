@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import { siteConfig } from "@/config/site";
 import { trackLead, trackContact } from "@/lib/metaPixel";
@@ -28,6 +28,12 @@ export function LeadFormSection() {
   const [submitted, setSubmitted] = useState(false);
   const [orderRef, setOrderRef] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const isSubmittingRef = useRef(false);
+  const idempotencyKeyRef = useRef("");
+
+  useEffect(() => {
+    idempotencyKeyRef.current = `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  }, []);
 
   // Listen to package selection from the pricing cards
   useEffect(() => {
@@ -48,6 +54,7 @@ export function LeadFormSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || isSubmittingRef.current) return;
     setErrorMsg("");
 
     if (!name.trim()) {
@@ -62,6 +69,7 @@ export function LeadFormSection() {
     }
 
     setLoading(true);
+    isSubmittingRef.current = true;
 
     try {
       const response = await fetch("/api/leads", {
@@ -75,13 +83,15 @@ export function LeadFormSection() {
           packageName: getPackageName(selectedPackage),
           timeline,
           contactMethod,
+          idempotencyKey: idempotencyKeyRef.current,
         }),
       });
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
-        const refId = result.reference || `RD-${Math.floor(100000 + Math.random() * 900000)}`;
+      // Only treat order as successful if response.ok AND result.success === true AND result.savedToDatabase === true
+      if (response.ok && result.success === true && result.savedToDatabase === true && result.reference) {
+        const refId = result.reference;
         setOrderRef(refId);
         setSubmitted(true);
 
@@ -99,17 +109,15 @@ export function LeadFormSection() {
           // ignore if canvas unavailable
         }
       } else {
-        setErrorMsg(result.message || "حدث خطأ أثناء معالجة الطلب، يرجى المحاولة مرة أخرى.");
+        // Show clear error message, allow retry, DO NOT trigger conversion
+        setErrorMsg(result.message || "تعذر حفظ بيانات طلبك في النظام حالياً. يرجى المحاولة مرة أخرى أو التواصل معنا عبر واتساب.");
       }
-    } catch {
-      // In case of any network issue, generate reference and allow WhatsApp confirmation
-      const fallbackRef = `RD-${Math.floor(100000 + Math.random() * 900000)}`;
-      setOrderRef(fallbackRef);
-      setSubmitted(true);
-      const currentPkg = siteConfig.packages.find((p) => p.id === selectedPackage);
-      trackLead(getPackageName(selectedPackage), currentPkg?.price, fallbackRef);
+    } catch (networkError) {
+      console.error("Lead submission network error:", networkError);
+      setErrorMsg("تعذر الاتصال بالخادم، يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً.");
     } finally {
       setLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 
@@ -173,7 +181,10 @@ export function LeadFormSection() {
                 </a>
 
                 <button
-                  onClick={() => setSubmitted(false)}
+                  onClick={() => {
+                    idempotencyKeyRef.current = `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+                    setSubmitted(false);
+                  }}
                   className="w-full sm:w-auto px-5 py-3.5 rounded-xl font-bold text-xs text-[#56138A] bg-white border border-[#ECE8F2] hover:bg-slate-50 transition-colors"
                 >
                   إرسال طلب آخر

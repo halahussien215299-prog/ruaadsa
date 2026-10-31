@@ -65,35 +65,46 @@ export const trackContact = (channel: "WhatsApp" | "Phone", label?: string) => {
   }
 };
 
+// Deduplication cache to prevent firing duplicate events for the same order
+const trackedOrderRefs = new Set<string>();
+
 /**
- * Track lead submission event
+ * Track lead submission event (Meta 'Lead' + TikTok 'SubmitForm')
+ * Guaranteed to fire at most once per unique order reference.
  */
 export const trackLead = (
   packageName: string,
   packagePrice?: number,
   orderRef?: string
 ) => {
-  if (typeof window !== "undefined") {
-    if (typeof window.fbq === "function") {
-      window.fbq("track", "Lead", {
-        content_name: packageName,
-        value: packagePrice || 0,
-        currency: "SAR",
-        order_id: orderRef || undefined,
-      });
+  if (typeof window === "undefined") return;
+
+  // Prevent duplicate tracking if the same order is re-rendered or submitted repeatedly
+  if (orderRef) {
+    if (trackedOrderRefs.has(orderRef)) {
+      return;
     }
-    if (typeof window.ttq?.track === "function") {
-      window.ttq.track("SubmitForm", {
-        content_name: packageName,
-        value: packagePrice || 0,
-        currency: "SAR",
-      });
-      window.ttq.track("CompleteRegistration", {
-        content_name: packageName,
-        value: packagePrice || 0,
-        currency: "SAR",
-      });
-    }
+    trackedOrderRefs.add(orderRef);
+  }
+
+  // Meta Pixel 'Lead' event
+  if (typeof window.fbq === "function") {
+    window.fbq("track", "Lead", {
+      content_name: packageName,
+      value: packagePrice || 0,
+      currency: "SAR",
+      order_id: orderRef || undefined,
+    });
+  }
+
+  // TikTok Pixel 'SubmitForm' event only (CompleteRegistration removed to avoid duplication)
+  if (typeof window.ttq?.track === "function") {
+    window.ttq.track("SubmitForm", {
+      content_name: packageName,
+      value: packagePrice || 0,
+      currency: "SAR",
+      event_id: orderRef || undefined,
+    });
   }
 };
 
