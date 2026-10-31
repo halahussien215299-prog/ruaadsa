@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Tajawal } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
-import { MetaPixel } from "@/components/analytics/MetaPixel";
 
 const tajawal = Tajawal({
   subsets: ["arabic"],
@@ -77,8 +76,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" className={`${tajawal.variable} scroll-smooth`}>
+      <head>
+        {/* Meta Pixel Base Code */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init', '1359207189452396');fbq('track', 'PageView');`,
+          }}
+        />
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=1359207189452396&ev=PageView&noscript=1"
+            alt="Meta Pixel"
+          />
+        </noscript>
+      </head>
       <body className="min-h-screen flex flex-col font-sans bg-[#FAF9FC] text-[#15101E] antialiased selection:bg-[#56138a] selection:text-white">
-        <MetaPixel />
         {children}
       </body>
     </html>
