@@ -7,6 +7,7 @@ import { VisualMockupSection } from "@/components/landing/VisualMockupSection";
 import { PortfolioSection } from "@/components/landing/PortfolioSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { PricingSection } from "@/components/landing/PricingSection";
+import { StorePricingSection } from "@/components/landing/StorePricingSection";
 import { LeadFormSection } from "@/components/landing/LeadFormSection";
 import { FaqSection } from "@/components/landing/FaqSection";
 import { StickyMobileBar } from "@/components/landing/StickyMobileBar";
@@ -32,8 +33,11 @@ export default function SingleLandingPage() {
       {/* 4. Core Features & Value Pillars */}
       <FeaturesSection />
 
-      {/* 5. The 3 Pricing Packages */}
+      {/* 5. The 3 Corporate Website Packages */}
       <PricingSection onSelectPackage={setSelectedPkg} />
+
+      {/* 5.1 The 3 E-Commerce Store Packages */}
+      <StorePricingSection onSelectPackage={setSelectedPkg} />
 
       {/* 6. Fast, Low-Friction Lead Generation Form */}
       <LeadFormSection />

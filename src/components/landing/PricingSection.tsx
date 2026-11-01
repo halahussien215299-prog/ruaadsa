@@ -46,11 +46,19 @@ export function PricingSection({ onSelectPackage }: PricingSectionProps) {
             <span>أسعار واضحة بدون مصاريف مخفية</span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#15101E] tracking-tight">
-            باقات تصميم المواقع الإلكترونية
+            باقات تصميم المواقع التعريفية
           </h2>
           <p className="mt-3 text-sm sm:text-base text-[#4B5563]">
-            اختر الباقة المناسبة لمرحلة نشاطك، مع إمكانية الترقية مستقبلاً بكل سهولة.
+            باقات متكاملة للمواقع التعريفية وصفحات الهبوط (عرض الـ 399 ريال خاص بالمواقع التعريفية فقط).
           </p>
+          <div className="mt-3.5">
+            <a
+              href="#store-pricing"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-1.5 rounded-full transition-colors shadow-2xs"
+            >
+              <span>هل تبحث عن متجر إلكتروني؟ اضغط هنا لباقات المتاجر 🛒</span>
+            </a>
+          </div>
         </div>
 
         {/* 3 Packages Cards */}

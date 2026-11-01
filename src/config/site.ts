@@ -13,6 +13,7 @@ export interface PricingPackage {
   deliveryDays: string;
   revisionRounds: string;
   supportDuration: string;
+  serviceType?: "website" | "store";
 }
 
 export interface SiteConfig {
@@ -53,6 +54,7 @@ export interface SiteConfig {
     hostingTerms: string;
   };
   packages: PricingPackage[];
+  storePackages: PricingPackage[];
   faqs: {
     question: string;
     answer: string;
@@ -180,6 +182,83 @@ export const siteConfig: SiteConfig = {
     },
   ],
 
+  storePackages: [
+    {
+      id: "store-catalog",
+      name: "متجر بدون بوابة دفع",
+      badge: "للبدء السريع وعرض المنتجات",
+      price: 1000,
+      currency: "ريال",
+      serviceType: "store",
+      description: "متجر إلكتروني احترافي لعرض المنتجات واستقبال الطلبات وتفاصيل الشراء مباشرة بدون دفع إلكتروني.",
+      targetAudience: "الأنشطة التي تفضل استقبال الطلبات عبر واتساب أو الدفع عند الاستلام",
+      pagesCount: "عرض غير محدود للمنتجات",
+      deliveryDays: "4 - 6 أيام عمل",
+      revisionRounds: "جولتان من التعديلات",
+      supportDuration: "دعم فني لمدة 30 يوماً",
+      features: [
+        "متجر إلكتروني احترافي متكامل لعرض منتجاتك",
+        "تقسيم المنتجات إلى فئات وأقسام وتصنيفات واضحة",
+        "سلة مشتريات وتجهيز كامل لتفاصيل الطلب",
+        "إرسال تفاصيل الفاتورة والطلب تلقائياً إلى واتساب",
+        "لوحة تحكم سهلة لإضافة وتعديل المنتجات والأسعار",
+        "دومين .com واستضافة سحابية سنة كاملة مجاناً",
+        "تصميم متوافق بنسبة 100% مع الجوال والتابلت",
+        "ربط بيكسل تيك توك وميتا لتتبع الزوار والطلبات",
+      ],
+    },
+    {
+      id: "store-salla",
+      name: "متجر على منصة سلة",
+      badge: "المنصة الأوسع انتشاراً بالسعودية",
+      isRecommended: true,
+      price: 1500,
+      currency: "ريال",
+      serviceType: "store",
+      description: "تهيئة وبناء وتصميم متجرك على منصة سلة السعودية مع ضبط خيارات الشحن والمدفوعات (السعر يشمل تهيئة وبناء المتجر فقط ، ولا يشمل اشتراك منصة سلة).",
+      targetAudience: "التجار وأصحاب المشاريع الراغبين في متجر معتمد على منصة سلة",
+      pagesCount: "متجر متكامل بجميع أقسامه",
+      deliveryDays: "4 - 6 أيام عمل",
+      revisionRounds: "3 جولات من التعديلات",
+      supportDuration: "دعم فني لمدة 30 يوماً",
+      features: [
+        "تهيئة وتصميم واجهة متجر سلة بالهوية البصرية لعلامتك",
+        "تصميم بنرات ترويجية وأيقونات مخصصة للمتجر",
+        "ضبط بوابات الدفع الإلكتروني (مدى، Apple Pay، فيزا، تابي/تمارا)",
+        "ضبط وتفعيل شركات الشحن والتوصيل المتوافقة مع سلة",
+        "إضافة وتنسيق أول 20 منتج مع الصور والأوصاف الاحترافية",
+        "ربط الدومين الخاص وإعدادات توثيق وتراخيص المتجر",
+        "ربط بيكسل تيك توك وسناب شات وميتا عبر سلة",
+        "ملاحظة: السعر يشمل التهيئة والبناء فقط ولا يشمل اشتراك منصة سلة",
+      ],
+    },
+    {
+      id: "store-custom",
+      name: "متجر خاص مع بوابة دفع",
+      badge: "تحكم كامل واستقلالية بدون عمولات",
+      price: 3500,
+      currency: "ريال",
+      serviceType: "store",
+      description: "متجر ببرمجة وتصميم خاص مع سلة تسوق كاملة وإمكانية الربط ببوابة دفع إلكتروني بدون أي عمولات شهرية على مبيعاتك.",
+      targetAudience: "البراندات والمشاريع الكبيرة الباحثة عن استقلالية تامة",
+      pagesCount: "متجر وبرمجة خاصة متكاملة",
+      deliveryDays: "7 - 10 أيام عمل",
+      revisionRounds: "تعديلات مرنة خلال فترة التنفيذ",
+      supportDuration: "دعم فني وأولوية استجابة لمدة 60 يوماً",
+      features: [
+        "برمجة وتصميم خاص 100% دون الاعتماد على منصات خارجية",
+        "سلة مشتريات وصفحة إتمام الطلب (Checkout) فائقة السرعة",
+        "إمكانية الربط المباشر ببوابة الدفع الإلكتروني المعتمدة",
+        "لوحة تحكم متطورة لإدارة المنتجات، المخزون، والطلبات",
+        "تقارير وإحصائيات مفصلة للمبيعات وسلوك العملاء",
+        "بدون أي عمولات مبيعات أو اشتراكات شهرية متكررة للمنصات",
+        "ربط متقدم لبيكسلات الإعلانات (TikTok, Meta, Google Analytics)",
+        "شهادة أمان SSL متقدمة واستضافة سحابية عالية الأداء",
+        "دعم فني وضمان برمجي لمدة 60 يوماً بعد الإطلاق",
+      ],
+    },
+  ],
+
   faqs: [
     {
       question: "كم يستغرق استلام الموقع الإلكتروني؟",
@@ -208,3 +287,25 @@ export const siteConfig: SiteConfig = {
     },
   ],
 };
+
+/**
+ * Helper to get all packages (both websites and stores)
+ */
+export function getAllPackages(): PricingPackage[] {
+  const websites = (siteConfig.packages || []).map((p) => ({
+    ...p,
+    serviceType: "website" as const,
+  }));
+  const stores = (siteConfig.storePackages || []).map((p) => ({
+    ...p,
+    serviceType: "store" as const,
+  }));
+  return [...websites, ...stores];
+}
+
+/**
+ * Helper to find a package by ID across all categories
+ */
+export function getPackageById(id: string): PricingPackage | undefined {
+  return getAllPackages().find((p) => p.id === id);
+}

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Lead } from "@/models/Lead";
 import { checkRateLimit } from "@/lib/security";
+import { getPackageById } from "@/config/site";
 
 const leadSchema = z.object({
   name: z.string().trim().min(2, "الاسم يجب ألا يقل عن حرفين").max(100, "الاسم طويل جداً"),
@@ -15,6 +16,8 @@ const leadSchema = z.object({
   business: z.string().trim().max(100).optional(),
   packageId: z.string().max(50),
   packageName: z.string().max(100),
+  serviceType: z.enum(["website", "store"]).optional(),
+  price: z.number().optional(),
   timeline: z.string().max(50).default("فوراً"),
   contactMethod: z.string().max(50).default("واتساب"),
   notes: z.string().max(500).optional(),
@@ -81,6 +84,15 @@ export async function POST(req: NextRequest) {
       console.warn("Idempotency check warning:", checkErr);
     }
 
+    // Resolve package metadata (price and service type)
+    const pkgInfo = getPackageById(validatedData.packageId);
+    const resolvedServiceType: "website" | "store" =
+      validatedData.serviceType ||
+      pkgInfo?.serviceType ||
+      (validatedData.packageId.startsWith("store") ? "store" : "website");
+    const resolvedPrice: number =
+      validatedData.price ?? pkgInfo?.price ?? 0;
+
     // Generate unique reference
     const leadRef = `RD-${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -96,6 +108,8 @@ export async function POST(req: NextRequest) {
           business: validatedData.business || "",
           packageId: validatedData.packageId,
           packageName: validatedData.packageName,
+          serviceType: resolvedServiceType,
+          price: resolvedPrice,
           timeline: validatedData.timeline,
           contactMethod: validatedData.contactMethod,
           status: "new",

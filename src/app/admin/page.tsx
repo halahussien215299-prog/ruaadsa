@@ -34,6 +34,8 @@ interface LeadItem {
   business?: string;
   packageId: string;
   packageName: string;
+  serviceType?: "website" | "store";
+  price?: number;
   timeline: string;
   contactMethod: string;
   status: "new" | "contacted" | "interested" | "not_interested" | "won" | "closed";
@@ -167,6 +169,8 @@ export default function AdminDashboardPage() {
       "رقم الجوال",
       "النشاط",
       "الباقة",
+      "نوع الخدمة",
+      "السعر (ر.س)",
       "موعد التنفيذ",
       "وسيلة التواصل",
       "الحالة",
@@ -178,6 +182,8 @@ export default function AdminDashboardPage() {
       `"${l.phone}"`,
       `"${l.business || ""}"`,
       `"${l.packageName}"`,
+      `"${l.serviceType === "store" ? "متجر إلكتروني" : "موقع تعريفي"}"`,
+      `"${l.price || 0}"`,
       `"${l.timeline}"`,
       `"${l.contactMethod}"`,
       `"${l.status}"`,
@@ -482,7 +488,25 @@ export default function AdminDashboardPage() {
                         </td>
 
                         <td className="p-3.5">
-                          <span className="font-bold text-[#15101E]">{lead.packageName}</span>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-bold text-[#15101E]">{lead.packageName}</span>
+                              {lead.serviceType === "store" ? (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                  متجر إلكتروني 🛒
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-[#56138A] border border-purple-200">
+                                  موقع تعريفي 🌐
+                                </span>
+                              )}
+                            </div>
+                            {lead.price ? (
+                              <span className="text-[11px] font-black text-[#56138A]">
+                                {lead.price.toLocaleString("ar-SA")} ر.س
+                              </span>
+                            ) : null}
+                          </div>
                         </td>
 
                         <td className="p-3.5">

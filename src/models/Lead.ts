@@ -7,6 +7,8 @@ export interface ILead extends Document {
   business?: string;
   packageId: string;
   packageName: string;
+  serviceType?: "website" | "store";
+  price?: number;
   timeline: string;
   contactMethod: string;
   status: "new" | "contacted" | "interested" | "not_interested" | "won" | "closed";
@@ -52,6 +54,16 @@ const LeadSchema: Schema = new Schema(
     packageName: {
       type: String,
       required: true,
+    },
+    serviceType: {
+      type: String,
+      enum: ["website", "store"],
+      default: "website",
+      index: true,
+    },
+    price: {
+      type: Number,
+      default: 0,
     },
     timeline: {
       type: String,

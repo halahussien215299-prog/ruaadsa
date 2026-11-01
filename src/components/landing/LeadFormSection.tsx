@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
-import { siteConfig } from "@/config/site";
+import { siteConfig, getPackageById } from "@/config/site";
 import { trackLead, trackContact } from "@/lib/metaPixel";
 import {
   Send,
@@ -48,8 +48,8 @@ export function LeadFormSection() {
   }, []);
 
   const getPackageName = (id: string) => {
-    const found = siteConfig.packages.find((p) => p.id === id);
-    return found ? `${found.name} (${found.price} ر.س)` : id;
+    const found = getPackageById(id);
+    return found ? `${found.name} (${found.price.toLocaleString("ar-SA")} ر.س)` : id;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,6 +72,10 @@ export function LeadFormSection() {
     isSubmittingRef.current = true;
 
     try {
+      const currentPkg = getPackageById(selectedPackage);
+      const resolvedPrice = currentPkg?.price || 0;
+      const resolvedServiceType = currentPkg?.serviceType || "website";
+
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -81,6 +85,8 @@ export function LeadFormSection() {
           business: business.trim(),
           packageId: selectedPackage,
           packageName: getPackageName(selectedPackage),
+          serviceType: resolvedServiceType,
+          price: resolvedPrice,
           timeline,
           contactMethod,
           idempotencyKey: idempotencyKeyRef.current,
@@ -95,8 +101,7 @@ export function LeadFormSection() {
         setOrderRef(refId);
         setSubmitted(true);
 
-        const currentPkg = siteConfig.packages.find((p) => p.id === selectedPackage);
-        trackLead(getPackageName(selectedPackage), currentPkg?.price, refId);
+        trackLead(getPackageName(selectedPackage), resolvedPrice, refId);
 
         try {
           confetti({
@@ -262,11 +267,20 @@ export function LeadFormSection() {
                     onChange={(e) => setSelectedPackage(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-white border border-[#D5CBE3] focus:border-[#56138A] focus:outline-none focus:ring-2 focus:ring-[#56138A]/10 text-sm text-[#15101E] font-medium"
                   >
-                    {siteConfig.packages.map((pkg) => (
-                      <option key={pkg.id} value={pkg.id}>
-                        {pkg.name} — {pkg.price} {pkg.currency}
-                      </option>
-                    ))}
+                    <optgroup label="🌐 باقات المواقع التعريفية">
+                      {siteConfig.packages.map((pkg) => (
+                        <option key={pkg.id} value={pkg.id}>
+                          {pkg.name} — {pkg.price.toLocaleString("ar-SA")} {pkg.currency}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="🛒 باقات المتاجر الإلكترونية">
+                      {siteConfig.storePackages.map((pkg) => (
+                        <option key={pkg.id} value={pkg.id}>
+                          {pkg.name} — {pkg.price.toLocaleString("ar-SA")} {pkg.currency}
+                        </option>
+                      ))}
+                    </optgroup>
                   </select>
                 </div>
               </div>
