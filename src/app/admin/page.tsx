@@ -58,16 +58,27 @@ export default function AdminDashboardPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [metrics, setMetrics] = useState({ total: 0, new: 0, contacted: 0, won: 0 });
   const [actionMsg, setActionMsg] = useState("");
+  const [fetchError, setFetchError] = useState("");
+  const [dbConnected, setDbConnected] = useState<boolean | null>(null);
 
   // Check auth and fetch leads
   const fetchLeads = async () => {
     setLoadingLeads(true);
+    setFetchError("");
     try {
       const url = new URL("/api/admin/leads", window.location.origin);
       if (statusFilter !== "all") url.searchParams.set("status", statusFilter);
       if (search.trim()) url.searchParams.set("search", search.trim());
+      url.searchParams.set("_t", Date.now().toString());
 
-      const res = await fetch(url.toString());
+      const res = await fetch(url.toString(), {
+        cache: "no-store",
+        headers: {
+          "Pragma": "no-cache",
+          "Cache-Control": "no-cache",
+        },
+      });
+
       if (res.status === 401) {
         setIsAuthenticated(false);
         setLeads([]);
@@ -75,13 +86,19 @@ export default function AdminDashboardPage() {
       }
 
       const data = await res.json();
-      if (data.success) {
+      if (res.ok && data.success) {
         setIsAuthenticated(true);
+        setDbConnected(true);
         setLeads(data.leads || []);
         if (data.metrics) setMetrics(data.metrics);
+      } else {
+        setDbConnected(false);
+        setFetchError(data.message || "تعذر تحميل البيانات من قاعدة البيانات");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setDbConnected(false);
+      setFetchError("خطأ في الاتصال بالخادم. يرجى التحقق من الاتصال وإعادة المحاولة.");
     } finally {
       setLoadingLeads(false);
     }
@@ -89,6 +106,12 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     fetchLeads();
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchLeads();
+      }
+    }, 25000);
+    return () => clearInterval(interval);
   }, [statusFilter]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -287,9 +310,23 @@ export default function AdminDashboardPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base sm:text-lg font-black text-[#15101E]">لوحة متابعة الطلبات</h1>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FAF2DC] text-[#966F13] border border-[#E9D6A0]">
-                  MongoDB Atlas متصل
-                </span>
+                {dbConnected === true && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>MongoDB Atlas متصل</span>
+                  </span>
+                )}
+                {dbConnected === false && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    <span>تعذر الاتصال بقاعدة البيانات</span>
+                  </span>
+                )}
+                {dbConnected === null && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FAF2DC] text-[#966F13] border border-[#E9D6A0]">
+                    جاري التحقق...
+                  </span>
+                )}
               </div>
               <p className="text-[11px] text-[#6B7280]">مؤسسة رواد الرقمية — المدينة المنورة</p>
             </div>
@@ -339,6 +376,22 @@ export default function AdminDashboardPage() {
           <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>{actionMsg}</span>
+          </div>
+        )}
+
+        {/* Database / Fetch Error Message */}
+        {fetchError && (
+          <div className="mb-4 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs font-bold flex items-center justify-between shadow-xs">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+              <span>{fetchError}</span>
+            </div>
+            <button
+              onClick={fetchLeads}
+              className="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold transition-colors shadow-xs"
+            >
+              إعادة المحاولة ↻
+            </button>
           </div>
         )}
 
@@ -443,10 +496,19 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#ECE8F2]">
-                {leads.length === 0 ? (
+                {loadingLeads && leads.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="text-center py-16 text-[#56138A]">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <RefreshCw className="w-6 h-6 animate-spin text-[#56138A]" />
+                        <span className="text-xs font-bold text-[#56138A]">جارٍ تحميل وتحديث الطلبات من MongoDB Atlas...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : leads.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="text-center py-12 text-gray-400">
-                      {loadingLeads ? "جارٍ تحميل الطلبات..." : "لا توجد طلبات مسجلة حالياً."}
+                      لا توجد طلبات مسجلة حالياً.
                     </td>
                   </tr>
                 ) : (

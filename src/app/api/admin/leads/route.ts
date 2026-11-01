@@ -13,7 +13,12 @@ export async function GET(req: NextRequest) {
   if (!checkAuth(req)) {
     return NextResponse.json(
       { success: false, message: "غير مصرح لك بالوصول" },
-      { status: 401 }
+      {
+        status: 401,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+        },
+      }
     );
   }
 
@@ -22,7 +27,12 @@ export async function GET(req: NextRequest) {
     if (!db) {
       return NextResponse.json(
         { success: false, message: "تعذر الاتصال بقاعدة البيانات MongoDB Atlas" },
-        { status: 503 }
+        {
+          status: 503,
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+          },
+        }
       );
     }
 
@@ -55,21 +65,35 @@ export async function GET(req: NextRequest) {
     const contactedLeads = await Lead.countDocuments({ status: "contacted" });
     const wonLeads = await Lead.countDocuments({ status: "won" });
 
-    return NextResponse.json({
-      success: true,
-      leads,
-      metrics: {
-        total: totalLeads,
-        new: newLeads,
-        contacted: contactedLeads,
-        won: wonLeads,
+    return NextResponse.json(
+      {
+        success: true,
+        leads,
+        metrics: {
+          total: totalLeads,
+          new: newLeads,
+          contacted: contactedLeads,
+          won: wonLeads,
+        },
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      }
+    );
   } catch (error: any) {
     console.error("Error fetching leads:", error);
     return NextResponse.json(
       { success: false, message: "حدث خطأ أثناء جلب الطلبات" },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+        },
+      }
     );
   }
 }

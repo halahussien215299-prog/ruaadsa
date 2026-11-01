@@ -11,6 +11,7 @@ import { StorePricingSection } from "@/components/landing/StorePricingSection";
 import { LeadFormSection } from "@/components/landing/LeadFormSection";
 import { FaqSection } from "@/components/landing/FaqSection";
 import { StickyMobileBar } from "@/components/landing/StickyMobileBar";
+import { ClarificationToast } from "@/components/landing/ClarificationToast";
 import { Footer } from "@/components/landing/Footer";
 
 export default function SingleLandingPage() {
@@ -50,6 +51,9 @@ export default function SingleLandingPage() {
 
       {/* 8. Sticky Mobile Bottom Conversion Bar for TikTok & Snapchat Traffic */}
       <StickyMobileBar />
+
+      {/* 9. Clarification Banner Toast (Appears after 7s, dismisses in 5s or on click) */}
+      <ClarificationToast />
     </main>
   );
 }
